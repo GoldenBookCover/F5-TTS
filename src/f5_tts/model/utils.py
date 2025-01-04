@@ -4,6 +4,7 @@ import os
 import random
 from collections import defaultdict
 from importlib.resources import files
+from importlib import import_module
 
 import torch
 from torch.nn.utils.rnn import pad_sequence
@@ -137,7 +138,9 @@ jieba.initialize()
 print("Word segmentation module jieba initialized.\n")
 
 
-def convert_char_to_pinyin(text_list, polyphone=True):
+def convert_char_to_pinyin(text_list: list[str], polyphone=True, language=None) -> list[list]:
+    """Pre-process input text by converting chars to tokens(e.g. pinyin).
+    """
     final_text_list = []
     custom_trans = str.maketrans(
         {";": ",", "“": '"', "”": '"', "‘": "'", "’": "'"}
@@ -147,6 +150,14 @@ def convert_char_to_pinyin(text_list, polyphone=True):
         return (
             "\u3100" <= c <= "\u9fff"  # common chinese characters
         )
+
+    if language.lower() in ('ne', ) :
+        tokenizer = import_module(f".cctokenizers.{language.lower()}").Tokenizer()
+        for text in text_list:
+            # text = one line
+            char_list = tokenizer.convert_chars(text.translate(custom_trans))
+            final_text_list.append(char_list)
+        return final_text_list
 
     for text in text_list:
         char_list = []
