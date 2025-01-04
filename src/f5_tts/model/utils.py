@@ -151,7 +151,7 @@ def convert_char_to_pinyin(text_list: list[str], polyphone=True, language=None) 
             "\u3100" <= c <= "\u9fff"  # common chinese characters
         )
 
-    if language.lower() in ('ne', ) :
+    if language is not None and language.lower() in ('ne', ) :
         tokenizer = import_module(f".cctokenizers.{language.lower()}").Tokenizer()
         for text in text_list:
             # text = one line
