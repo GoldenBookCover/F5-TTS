@@ -140,8 +140,14 @@ print("Word segmentation module jieba initialized.\n")
 
 def convert_char_to_pinyin(text_list: list[str], polyphone=True, language=None) -> list[list]:
     """Pre-process input text by converting chars to tokens(e.g. pinyin).
+
+    :param text_list: a list of text lines, one element is one line of text
+    :param polyphone: unknown
+    :param language: language of the model(two letters)
+    :return: a list of tokens, one element is one line of tokens
     """
     final_text_list = []
+    # TODO: Move this to language-tokenizer modules
     custom_trans = str.maketrans(
         {";": ",", "“": '"', "”": '"', "‘": "'", "’": "'"}
     )  # add custom trans here, to address oov
@@ -150,12 +156,14 @@ def convert_char_to_pinyin(text_list: list[str], polyphone=True, language=None) 
         return (
             "\u3100" <= c <= "\u9fff"  # common chinese characters
         )
+    
+    supported_languages = ('ne', 'bg')
 
-    if language is not None and language.lower() in ('ne', ) :
+    if language is not None and language.lower() in supported_languages :
         tokenizer = import_module(f".cctokenizers.{language.lower()}").Tokenizer()
         for text in text_list:
             # text = one line
-            char_list = tokenizer.convert_chars(text.translate(custom_trans))
+            char_list = tokenizer.convert_chars(text)
             final_text_list.append(char_list)
         return final_text_list
 
